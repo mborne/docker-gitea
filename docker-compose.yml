@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+
+  gitea:
+    container_name: gitea
+    image: mborne/gitea:latest
+    build:
+      context: .
+      args:
+        version: 1.11.3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitea.rule=Host(`gitea.${HOST_HOSTNAME}`)"
+      - "traefik.http.services.gitea-service.loadbalancer.server.port=3000"
+    volumes:
+      - gitea-data:/data
+      - backup:/backup
+    restart: unless-stopped
+
+volumes:
+  backup:
+    name: backup
+  gitea-data:
+    name: gitea-data
+
+networks:
+  default:
+    external:
+      name: devbox
